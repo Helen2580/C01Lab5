@@ -7,48 +7,43 @@ on:
   push:
       branches: ["main"]
   pull_request: 
-        branches: ["main", "fix/workflow-changes"]
-
+      branches: ["main", "fix/workflow-changes"]
+        
 jobs:
-    build:
-        name: Backend test
-        runs-on: ubuntu-latest
+  build:
+    name: Backend Test with MongoDB
+    runs-on: ubuntu-latest
 
-        defaults:
-            run:
-                working-directory: ./quirknotes/backend
+    defaults:
+      run:
+        working-directory: ./quirknotes/backend
 
-        strategy:
-            matrix:
-                node-version: [20.x]
+    strategy:
+      matrix:
+        node-version: [20.x]
 
-        services:
-          mongodb:
-            image: mongo
-            ports:
-              - 27017:27017
-            # options: --health-cmd="mongo --eval 'db.runCommand({ping: 1})'" --health-interval=10s --health-timeout=5s --health-retries=5
+    services:
+      mongodb:
+        image: mongo
+        ports:
+          - 27017:27017
 
-        steps:
-            - uses: actions/checkout@v3
+    steps:
+      - uses: actions/checkout@v3
 
-            - name: Use Node.js ${{ matrix.node-version }}
-              uses: actions/setup-node@v3
-              with:
-                node-version: ${{ matrix.node-version }}
-            - run: npm i
-            - run: npm test
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      
+      - name: Install MongoDB
+        uses: supercharge/mongodb-github-action@1.6.0
+        with:
+          mongodb-version: '4.4'
 
-            - name: Start MongoDB
-              run: sudo service mongodb start 
-            
-            - name: Start server
-              run: node server.js &
-              env:
-                MONGODB_URI: mongodb://localhost:27017/db
-                # MONGODB_URI: mongodb://localhost:4000
-                #C:\Users\ASUS\Documents\GitHub\C01Lab5\quirknotes\backend\data\db
-            - name: Run tests
-              run: npm test
-              env:
-                MONGODB_URI: mongodb://localhost:27017/db
+      - run: npm i
+
+      - name: Start Server
+        run: nohup node server.js &
+
+      - run: npm test
