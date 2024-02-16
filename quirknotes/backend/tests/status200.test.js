@@ -26,47 +26,82 @@ test("/postNote - Post a note", async () => {
   expect(postNoteBody.response).toBe("Note added succesfully.");
 });
 
-test("/getAllNotes - Return list of zero notes for getAllNotes", async () => {
-  // Code here
-  expect(false).toBe(true);
-});
+const request = require('supertest');
+const app = require('../app'); // Replace with the path to your Express app
 
-test("/getAllNotes - Return list of two notes for getAllNotes", async () => {
-  // Code here
-  expect(false).toBe(true);
-});
+describe('Notes API', () => {
+    test('/getAllNotes - Return list of zero notes for getAllNotes', async () => {
+        const response = await request(app).get('/getAllNotes');
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toEqual([]); // Assuming the response is an array of notes
+    });
 
-test("/deleteNote - Delete a note", async () => {
-  // Code here
-  expect(false).toBe(true);
-});
+    test('/getAllNotes - Return list of two notes for getAllNotes', async () => {
+        // Add two notes to the database here
 
-test("/patchNote - Patch with content and title", async () => {
-  // Code here
-  expect(false).toBe(true);
-});
+        const response = await request(app).get('/getAllNotes');
+        expect(response.statusCode).toBe(200);
+        expect(response.body.length).toBe(2);
+        // Clean up by removing the added notes
+    });
 
-test("/patchNote - Patch with just title", async () => {
-  // Code here
-  expect(false).toBe(true);
-});
+    test('/deleteNote - Delete a note', async () => {
+        // Add a note to delete
 
-test("/patchNote - Patch with just content", async () => {
-  // Code here
-  expect(false).toBe(true);
-});
+        const response = await request(app).delete('/deleteNote/{noteId}');
+        expect(response.statusCode).toBe(200);
+        // Check if the note is actually deleted
+    });
 
-test("/deleteAllNotes - Delete one note", async () => {
-  // Code here
-  expect(false).toBe(true);
-});
+    test('/patchNote - Patch with content and title', async () => {
+        // Add a note to update
 
-test("/deleteAllNotes - Delete three notes", async () => {
-  // Code here
-  expect(false).toBe(true);
-});
+        const response = await request(app).patch('/patchNote/{noteId}')
+            .send({ title: 'New Title', content: 'New Content' });
+        expect(response.statusCode).toBe(200);
+        // Verify the note's title and content are updated
+    });
 
-test("/updateNoteColor - Update color of a note to red (#FF0000)", async () => {
-  // Code here
-  expect(false).toBe(true);
+    test('/patchNote - Patch with just title', async () => {
+        // Add a note to update
+
+        const response = await request(app).patch('/patchNote/{noteId}')
+            .send({ title: 'New Title' });
+        expect(response.statusCode).toBe(200);
+        // Verify the note's title is updated
+    });
+
+    test('/patchNote - Patch with just content', async () => {
+        // Add a note to update
+
+        const response = await request(app).patch('/patchNote/{noteId}')
+            .send({ content: 'New Content' });
+        expect(response.statusCode).toBe(200);
+        // Verify the note's content is updated
+    });
+
+    test('/deleteAllNotes - Delete one note', async () => {
+        // Add a note to delete
+
+        const response = await request(app).delete('/deleteAllNotes');
+        expect(response.statusCode).toBe(200);
+        // Check if the note is actually deleted
+    });
+
+    test('/deleteAllNotes - Delete three notes', async () => {
+        // Add three notes to delete
+
+        const response = await request(app).delete('/deleteAllNotes');
+        expect(response.statusCode).toBe(200);
+        // Check if all three notes are actually deleted
+    });
+
+    test('/updateNoteColor - Update color of a note to red (#FF0000)', async () => {
+        // Add a note to update
+
+        const response = await request(app).patch('/updateNoteColor/{noteId}')
+            .send({ color: '#FF0000' });
+        expect(response.statusCode).toBe(200);
+        // Verify the note's color is updated to red
+    });
 });
