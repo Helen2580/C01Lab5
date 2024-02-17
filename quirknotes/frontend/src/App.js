@@ -39,6 +39,7 @@ function App() {
     getNotes()
   }, [])
 
+
   const deleteNote = async (entry) => {
     deleteNoteState(entry._id);
 
